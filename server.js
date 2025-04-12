@@ -32,6 +32,31 @@ const createTables = db.transaction(() => {
         )
         `
     ).run()
+
+    db.prepare(
+        `
+        CREATE TABLE IF NOT EXISTS likes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        authorid INTEGER NOT NULL,
+        postid INTEGER NOT NULL,
+        FOREIGN KEY (authorid) REFERENCES users (id),
+        FOREIGN KEY (postid) REFERENCES posts (id)
+        )
+        `
+    ).run()
+
+    db.prepare(
+        `
+        CREATE TABLE IF NOT EXISTS comments (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        authorid INTEGER NOT NULL,
+        postid INTEGER NOT NULL,
+        content STRING NOT NULL,
+        FOREIGN KEY (authorid) REFERENCES users (id),
+        FOREIGN KEY (postid) REFERENCES posts (id)
+        )
+        `
+    ).run()
 })
 
 createTables();
@@ -76,7 +101,10 @@ app.get("/", (req,res) => {
         const allPostsStatement = db.prepare("SELECT posts.*, users.username FROM posts INNER JOIN users ON posts.authorid = users.id ORDER BY createdDate DESC")
         const allPosts = allPostsStatement.all() // .all is like .get, but it gets all isntead
 
-        return res.render("allposts", {allPosts})
+        const commentStatement = db.prepare("SELECT * FROM comments")
+        const comments = commentStatement.all() // .all is like .get, but it gets all isntead
+
+        return res.render("allposts", {allPosts, comments})
     }
     res.render("homepage")
 })
@@ -188,9 +216,14 @@ app.get("/post/:id", (req,res)=>{
         return res.redirect("/")
     }
 
+    const commentStatement = db.prepare("SELECT comments.*, posts.id, users.username FROM comments INNER JOIN posts ON comments.postid = posts.id INNER JOIN users ON comments.authorid = users.id WHERE posts.id = ? ORDER BY id DESC")
+    const comments = commentStatement.all(req.params.id)
+
+    console.log(comments);
+
     const isAuthor = post.authorid === req.user.userid
 
-    res.render("single-post", {post,isAuthor})
+    res.render("single-post", {post,isAuthor,comments})
 })
 
 
@@ -241,6 +274,36 @@ app.post("/create-post",mustBeLoggedIn, (req, res)=>{
     const realPost = getPostStatement.get(result.lastInsertRowid)
 
     res.redirect(`/post/${realPost.id}`)
+})
+
+//Adding a comment
+app.post("/add-comment",mustBeLoggedIn, (req, res)=>{
+    const errors = []
+
+    if(typeof req.body.title !== "string") req.body.title = ""
+
+    //trim - sanitize or strip out html
+    req.body.title = sanitizeHTML(req.body.title.trim(), {allowedTags: [], allowedAttributes: {}})
+
+    if(!req.body.body) errors.push("you must provide a comment")
+
+
+    const postId = req.body.postId
+
+    if(errors.length) {
+        return res.redirect(`post/${postId}`)
+    }
+
+    
+
+    
+    // save into database
+    const ourStatement = db.prepare("INSERT INTO comments (postid,content,authorid) VALUES (?,?,?)")
+    const result = ourStatement.run(postId, req.body.body, req.user.userid)
+
+
+    res.redirect(`/post/${postId}`)
+    
 })
 
 

@@ -23,9 +23,34 @@
         <form style="display: inline" action="/delete-post/<%= post.id %>" method="POST">
             <button>Delete Post</button>
         </form>
-        <%
-        }%>
+        <% } %>
+    
+        <div style="font-size: large; font-weight: 600; padding-bottom: 4px;">Add Comment</div>
+        <form action="/add-comment" method="POST">
+            <fieldset>
+                <textarea name="body" id="body"></textarea>
 
+                <br>
+                <button style="font-size: small;">Add Comment</button>
+                <input name="postId" id="postId" value="<%= post.id %>" type="hidden"/>
+
+
+            </fieldset>
+        </form>
+
+        <div style="font-size: large; font-weight: 600; padding-bottom: 4px;">Comments</div>
+        <% comments.forEach(comment => { %>
+        <article>
+            <small style="color: #aaa; padding-bottom: 32px; font-size: smaller;"> From <span style="color: white; font-weight: 600;"><%= comment.username %></span></small>
+            <br>
+            <div class="article">
+                <body>
+                    <%= comment.content %>
+                </body>
+            </div>
+            
+        </article>
+        <% }) %>
         
     </main>
 
