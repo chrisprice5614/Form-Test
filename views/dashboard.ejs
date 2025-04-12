@@ -20,14 +20,6 @@
         </ul>
 
 
-        <ul>
-            <% allPosts.forEach(thisPost => { %>
-            <li><a href="/post/<%= thisPost.id %>"> <%= thisPost.title %></a> by <%= thisPost.username %> on <%= new Date(thisPost.createdDate).getMonth()+1 %>/<%= new Date(thisPost.createdDate).getDate() %>/<%= new Date(thisPost.createdDate).getFullYear() %></li>
-
-
-            <% }) %>
-        </ul>
-
 
     </main>
 

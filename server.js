@@ -72,14 +72,24 @@ app.use(function (req, res, next) {
 app.get("/", (req,res) => {
     //res.send("Hello world from our cool app :)")
     if(req.user) {
+
+        const allPostsStatement = db.prepare("SELECT posts.*, users.username FROM posts INNER JOIN users ON posts.authorid = users.id ORDER BY createdDate DESC")
+        const allPosts = allPostsStatement.all() // .all is like .get, but it gets all isntead
+
+        return res.render("allposts", {allPosts})
+    }
+    res.render("homepage")
+})
+
+
+app.get("/dashboard", (req,res) => {
+    //res.send("Hello world from our cool app :)")
+    if(req.user) {
         const postsStatement = db.prepare("SELECT * FROM posts WHERE authorid = ? ORDER BY createdDate DESC")
         const posts = postsStatement.all(req.user.userid) // .all is like .get, but it gets all isntead
 
-        const allPostsStatement = db.prepare("SELECT posts.*, users.username FROM posts INNER JOIN users ON posts.authorid = users.id WHERE authorid != ? ORDER BY createdDate DESC")
-        
-        const allPosts = allPostsStatement.all(req.user.userid) // .all is like .get, but it gets all isntead
 
-        return res.render("dashboard", {posts, allPosts})
+        return res.render("dashboard", {posts})
     }
     res.render("homepage")
 })

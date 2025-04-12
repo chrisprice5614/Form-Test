@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include("includes/head") %>
+<body>
+    <%- include("includes/header") %>
+    <main>
+
+       
+
+        <% if(allPosts.length == 0 ) {%>
+        <h4>Welcome, <%= user.username %>, there are no posts yet!</h4>
+        <% } else {%>
+        <h4>Welcome, <%= user.username %>, here's the recent posts!</h4>
+        <% } %>
+
+        <a href="/create-post" class="button">Create Post</a>
+
+        <br>
+
+        <% allPosts.forEach(thisPost => { %>
+        <article>
+            <a href="/post/<%= thisPost.id %>" style="font-weight: 600; font-size: x-large;"><div style="font-weight: 600; font-size: x-large;"><%= thisPost.title %></div></a>
+            <small style="color: #aaa; padding-bottom: 32px; font-size: smaller;"> Posted by <span style="color: white; font-weight: 600;"><%= thisPost.username %></span> on <%= new Date(thisPost.createdDate).getMonth()+1 %>/<%= new Date(thisPost.createdDate).getDate() %>/<%= new Date(thisPost.createdDate).getFullYear() %></small>
+            <br>
+            <div class="article">
+                <body>
+                    <%= thisPost.content %>
+                </body>
+            </div>
+        </article>
+        <% }) %>
+
+        
+
+
+    </main>
+
+    <%- include("includes/footer") %>
+</body>
+</html>

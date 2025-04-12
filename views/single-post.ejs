@@ -7,7 +7,7 @@
         <!-- angle bracket percent equal means it'll show as an echo and be safe -->
         <h1><%= post.title %></h1>
         <article>
-            <small> Posted by <%= post.username %> on <%= new Date(post.createdDate).getMonth()+1 %>/<%= new Date(post.createdDate).getDate() %>/<%= new Date(post.createdDate).getFullYear() %></small>
+            <small style="color: #aaa; padding-bottom: 32px; font-size: smaller;"> Posted by <span style="color: white; font-weight: 600;"><%= post.username %></span> on <%= new Date(post.createdDate).getMonth()+1 %>/<%= new Date(post.createdDate).getDate() %>/<%= new Date(post.createdDate).getFullYear() %></small>
             <div>
                 <body>
                     <%= post.content %>
